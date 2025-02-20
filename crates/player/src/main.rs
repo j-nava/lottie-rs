@@ -6,7 +6,7 @@ use std::path::Path;
 // use bevy_prototype_debug_lines::{DebugLines, DebugLinesPlugin};
 use anyhow::Error;
 use clap::Parser;
-use lottie::{Config, HeadlessConfig, Lottie, Renderer, Target, WindowConfig};
+use lottie::{Config, HeadlessConfig, Lottie, MockFont, Renderer, Target, WindowConfig};
 use lottie_renderer_bevy::BevyRenderer;
 use smol::pin;
 use smol::stream::StreamExt;
@@ -56,8 +56,8 @@ fn main() -> Result<(), Error> {
         filename = "output".to_string();
     }
     let root_path = &*root_path.to_string_lossy();
-    let f = fs::File::open(path).unwrap();
-    let mut lottie = Lottie::from_reader(f, root_path).unwrap();
+    let mut f = fs::File::open(path).unwrap();
+    let mut lottie = Lottie::<MockFont>::from_reader(&mut f, root_path).unwrap();
     lottie.scale = args.scale.unwrap_or(1.0);
     let final_timestamp = (lottie.model.end_frame / lottie.model.frame_rate * 1000.0) as i32;
     let (mut renderer, frame_stream) = BevyRenderer::new();
@@ -93,7 +93,7 @@ fn main() -> Result<(), Error> {
         // renderer.add_plugin(DebugLinesPlugin::default());
         // renderer.add_system(axis_system);
         renderer.load_lottie(lottie, config);
-        renderer.render();
+        <lottie_renderer_bevy::BevyRenderer as lottie::Renderer<MockFont>>::render(&mut renderer);
         pin!(frame_stream);
         let mut i = 0;
         if all_frames {

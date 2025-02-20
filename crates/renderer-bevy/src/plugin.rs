@@ -3,7 +3,7 @@ use bevy::render::mesh::{Indices, MeshVertexAttribute};
 use bevy::render::render_asset::RenderAssetUsages;
 use bevy::render::render_resource::*;
 use bevy::sprite::*;
-use lottie::tiny_skia_path as ts;
+use tiny_skia as ts;
 use lyon::geom::euclid::point2;
 use lyon::lyon_tessellation::*;
 use lyon::path::{Event, Path as LyonPath};

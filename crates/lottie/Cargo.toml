@@ -11,29 +11,34 @@ readme = "README.md"
 repository = "https://github.com/zimond/lottie-rs/"
 
 [dependencies]
-flo_curves = "0.7.2"
-glam = "0.25.0"
-lyon_path = "1.0.4"
-slotmap = "1.0.6"
-thiserror = "1.0.30"
-fontkit = "0.6.0-beta.2"
-ureq = "2.7.1"
-base64 = "0.22.1"
-url = "2.4.1"
-log = "0.4.17"
-euclid = "0.22.7"
-serde_json = "1.0.79"
-serde_repr = "0.1.7"
-read_color = "1.0.0"
-ordered-float = "4.2.0"
+flo_curves = "0"
+glam = "0"
+lyon_path = "1"
+slotmap = "1"
+thiserror = "1"
+ureq = "2"
+base64 = "0"
+url = "2"
+log = "0"
+euclid = "0"
+serde_json = "1"
+serde_repr = "0"
+read_color = "1"
+ordered-float = "4"
+fontkit = { version = "0", optional = true }
 
 [dependencies.serde]
 features = ["derive"]
-version = "1.0.136"
+version = "1"
 
 
 [dev-dependencies]
-serde_path_to_error = "0.1.7"
+serde_path_to_error = "0"
 
 [target.'cfg(not(all(target_os = "unknown", target_arch = "wasm32")))'.dependencies]
-dirs = "5.0.0"
+dirs = "5"
+
+[features]
+default = []
+text = ["fontkit-lib"]
+fontkit-lib = ["fontkit"]

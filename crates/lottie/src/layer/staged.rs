@@ -91,7 +91,7 @@ impl ContentInfo {
     pub fn from_layer(
         layer: Layer,
         model: &Model,
-        fontdb: &FontDB,
+        fontdb: &impl FontDB,
         root_path: &str,
     ) -> Result<ContentInfo, Error> {
         let content = match layer.content.clone() {
@@ -155,6 +155,7 @@ impl ContentInfo {
             LayerContent::PreCompositionRef(_)
             | LayerContent::Empty
             | LayerContent::MediaRef(_) => ContentInfo::Simple(RenderableContent::Group.into()),
+            #[cfg(feature = "text")]
             LayerContent::Text(text) => match RenderableContent::from_text(&text, model, fontdb) {
                 Ok(t) => ContentInfo::TextKeyframes(
                     t.keyframes

@@ -37,7 +37,7 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn from_reader<R: std::io::Read>(r: R) -> Result<Self, serde_json::Error> {
+    pub fn from_reader<R: std::io::Read>(r: &mut R) -> Result<Self, serde_json::Error> {
         serde_json::from_reader(r)
     }
 
@@ -138,6 +138,7 @@ pub enum LayerContent {
     MediaRef(MediaRef),
     Empty,
     Shape(ShapeGroup),
+    #[cfg(feature = "text")]
     Text(TextAnimationData),
     Media(Media),
 }

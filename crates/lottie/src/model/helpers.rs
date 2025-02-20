@@ -132,6 +132,7 @@ impl<'de> serde::Deserialize<'de> for LayerContent {
                         .unwrap_or_default();
                     LayerContent::Shape(ShapeGroup { shapes })
                 }
+                #[cfg(feature = "text")]
                 5 => {
                     let v = value.get("t").ok_or_else(|| D::Error::missing_field("t"))?;
                     let v = TextAnimationData::deserialize(v).map_err(D::Error::custom)?;

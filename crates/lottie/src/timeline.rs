@@ -74,7 +74,7 @@ impl Timeline {
         self.store.get(id)
     }
 
-    pub(crate) fn new(model: &Model, fontdb: &FontDB, root_path: &str) -> Result<Self, Error> {
+    pub(crate) fn new(model: &Model, fontdb: &impl FontDB, root_path: &str) -> Result<Self, Error> {
         let mut timeline = Timeline {
             start_frame: 0.0,
             end_frame: 0.0,

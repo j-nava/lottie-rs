@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::path::PathBuf;
 
-use lottie::{Config, Error, HeadlessConfig, Lottie, Renderer};
+use lottie::{Config, Error, HeadlessConfig, Lottie, MockFont, Renderer};
 use lottie_renderer_bevy::BevyRenderer;
 use rstest::rstest;
 use smol::stream::StreamExt;
@@ -10,8 +10,8 @@ use smol::stream::StreamExt;
 fn check_fixture(
     #[files("../../fixtures/ui/checked/**/*.json")] path: PathBuf,
 ) -> Result<(), Error> {
-    let f = File::open(&path)?;
-    let lottie = Lottie::from_reader(f, "../../")?;
+    let mut f = File::open(&path)?;
+    let lottie = Lottie::<MockFont>::from_reader(&mut f, "../../")?;
     let (mut renderer, frame_stream) = BevyRenderer::new();
     renderer.load_lottie(
         lottie,
@@ -21,7 +21,7 @@ fn check_fixture(
             frame: None,
         }),
     );
-    renderer.render();
+    <lottie_renderer_bevy::BevyRenderer as lottie::Renderer<MockFont>>::render(&mut renderer);
     let filename = path.file_stem().unwrap();
     let mut path = path.clone();
     path.pop();

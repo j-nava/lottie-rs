@@ -47,8 +47,8 @@ use plugin::LottiePlugin;
 use render::*;
 
 #[derive(Component)]
-pub struct LottieComp {
-    lottie: Lottie,
+pub struct LottieComp<F: FontDB> {
+    lottie: Lottie<F>,
 }
 
 #[derive(Component)]
@@ -58,8 +58,8 @@ struct LottieShapeComp(StyledShape);
 struct LayerId(TimelineItemId);
 
 #[derive(Resource)]
-struct LottieGlobals {
-    lottie: Option<Lottie>,
+struct LottieGlobals<F: FontDB> {
+    lottie: Option<Lottie<F>>,
     capturing: bool,
     config: Config,
 }
@@ -130,7 +130,7 @@ impl BevyRenderer {
         let (sender, receiver) = unbounded();
 
         (
-            BevyRenderer {
+            Self {
                 app,
                 frame_sender: sender,
             },
@@ -151,8 +151,8 @@ impl BevyRenderer {
     }
 }
 
-impl Renderer for BevyRenderer {
-    fn load_lottie(&mut self, lottie: Lottie, config: Config) {
+impl<F: FontDB + Send + Sync + 'static> Renderer<F> for BevyRenderer {
+    fn load_lottie(&mut self, lottie: Lottie<F>, config: Config) {
         let width = lottie.model.width as f32 * lottie.scale;
         let height = lottie.model.height as f32 * lottie.scale;
         let capturing = if let Config::Headless(_) = &config {
@@ -192,8 +192,8 @@ impl Renderer for BevyRenderer {
             .add_systems(Update, component_animator_system::<Transform>)
             .add_systems(Update, component_animator_system::<Path>)
             .add_systems(Update, component_animator_system::<DrawMode>)
-            .add_systems(Update, animate_system)
-            .add_systems(Startup, setup_system);
+            .add_systems(Update, animate_system::<F>)
+            .add_systems(Startup, setup_system::<F>);
 
         if let Config::Window(window_conf) = &config {
             #[cfg(feature = "bevy_egui")]
@@ -210,7 +210,7 @@ impl Renderer for BevyRenderer {
         }
 
         let frame_rate = lottie.model.frame_rate as f64;
-        self.app.insert_resource(LottieGlobals {
+        self.app.insert_resource(LottieGlobals::<F> {
             lottie: Some(lottie),
             capturing,
             config,
@@ -238,9 +238,9 @@ impl Renderer for BevyRenderer {
     }
 }
 
-fn setup_system(
+fn setup_system<F: FontDB + Send + Sync + 'static> (
     mut commands: Commands,
-    mut lottie_globals: ResMut<LottieGlobals>,
+    mut lottie_globals: ResMut<LottieGlobals<F>>,
     mut image_assets: ResMut<Assets<Image>>,
     mut audio_assets: ResMut<Assets<AudioSource>>,
     mut material_assets: ResMut<Assets<LottieMaterial>>,
@@ -501,7 +501,7 @@ fn setup_system(
     commands.entity(root_entity).insert(comp);
 }
 
-fn animate_system(
+fn animate_system<F: FontDB + Send + Sync + 'static>(
     mut visibility_query: Query<(
         Entity,
         &mut Visibility,
@@ -514,7 +514,7 @@ fn animate_system(
     mut path_animation: Query<(&mut Animator<Path>, &FrameTracker)>,
     mut draw_mode_animation: Query<(&mut Animator<DrawMode>, &FrameTracker)>,
     mut info: ResMut<LottieAnimationInfo>,
-    lottie: Res<LottieGlobals>,
+    lottie: Res<LottieGlobals<F>>,
     time: Res<Time>,
 ) {
     let capturing = lottie.capturing;

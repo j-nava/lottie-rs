@@ -1,4 +1,4 @@
-use crate::Lottie;
+use crate::{font::FontDB, Lottie};
 
 pub struct WindowConfig {
     pub show_controls: bool,
@@ -23,9 +23,9 @@ pub enum Config {
 }
 
 /// The fundamental trait that every renderer need to implement
-pub trait Renderer {
+pub trait Renderer<F: FontDB> {
     /// Load a [Lottie] into this renderer
-    fn load_lottie(&mut self, lottie: Lottie, config: Config);
+    fn load_lottie(&mut self, lottie: Lottie<F>, config: Config);
     /// Render the lottie file, possibly mutating self
     fn render(&mut self);
 }
